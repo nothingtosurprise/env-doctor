@@ -1,0 +1,43 @@
+# .env Doctor
+
+A Python MCP server and web UI that diagnoses .env files for common issues that cause production incidents and security breaches.
+
+## Purpose
+
+Developers frequently ship bugs caused by missing environment variables, weak secrets, misconfigured values, or accidentally committed API keys. .env Doctor catches all of these automatically before they become problems.
+
+## MCP Tools
+
+- `diagnose_env(env_content, example_content)` — Diagnose a .env file passed as a string. Returns a JSON report with score, issues, warnings, and info.
+- `diagnose_env_file(env_path, example_path)` — Same but reads from disk paths.
+- `scan_project(project_path)` — Scans an entire project directory for all .env variants and returns a combined report.
+- `generate_example(env_content)` — Generates a safe .env.example from a real .env, replacing all secrets with placeholders.
+
+## What it detects
+
+- Missing variables: keys in .env.example that don't exist in .env
+- Empty values: variables with no value that may cause runtime crashes
+- Exposed real secrets: detects patterns matching real API keys (OpenAI sk-, Stripe pk_live_, AWS AKIA, GitHub ghp_, Slack xoxb-, JWTs)
+- Weak secrets: placeholder values like "secret", "password", "123456", "changeme" on sensitive fields
+- Format errors: URLs not starting with http://, non-numeric ports, non-boolean debug flags, invalid emails
+- Undocumented vars: keys in .env not present in .env.example
+
+## Health Score
+
+Each file gets a score 0-100. Critical issues deduct 30 points, errors deduct 10, warnings deduct 5.
+
+## Supported .env variants
+
+.env, .env.local, .env.development, .env.production, .env.staging, .env.test, .env.dev, .env.prod
+
+## Server
+
+Located at server/server.py. Built with FastMCP (Python). Run with: python server/server.py
+
+## Frontend
+
+Located at frontend/index.html. Pure HTML/CSS/JS — no build step, no dependencies. Open directly in browser.
+
+## License
+
+MIT
